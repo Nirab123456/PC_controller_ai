@@ -1,1 +1,6 @@
+psutil
+pynvml
+wmi
+ctypes
+pandas
 
