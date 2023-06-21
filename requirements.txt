@@ -3,4 +3,4 @@ pynvml
 wmi
 ctypes
 pandas
-
+numpy
