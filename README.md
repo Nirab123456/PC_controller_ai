@@ -1,4 +1,4 @@
-**Project Name: PC Application Monitoring**
+**Project Name: PC Application Monitoring(mainly for collecting training_dataset)**
 
 README
 
