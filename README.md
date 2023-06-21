@@ -22,7 +22,7 @@ To get started with the project, follow the steps below to install the required 
 
 2. Clone the project repository from GitHub:
    ```
-   git clone <[repository_ur](https://github.com/Nirab123456/PC_controller_ai.git)l>
+   git clone <repository_ur](https://github.com/Nirab123456/PC_controller_ai.git>
    ```
 
 3. Navigate to the project directory:
