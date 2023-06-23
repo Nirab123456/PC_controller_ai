@@ -10,25 +10,13 @@ from torch import optim
 import subprocess
 import PySimpleGUI as sg
 from PySimpleGUI.PySimpleGUI import Window
+import sys
+import os
+from try_act_1 import new_folder
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-pandas_dataframe_1 = pandas_dataframe()
 
-df = pandas_dataframe_1.dataframe()
-df.dropna(inplace=True)
-df['Type'] = df['Type'].replace({'non_interacting_processes': '0', 'interacting_processes': '1'})
-df.drop(['Name'], axis=1, inplace=True)
-df = df.astype('float32')
 
-columns_to_normalize = ['cpu_uses', 'memory_uses', 'Wi_fi_uses', 'disc_uses']
-
-scaler = MinMaxScaler(feature_range=(0, 1))
-df[columns_to_normalize] = scaler.fit_transform(df[columns_to_normalize])
-# Create the PySimpleGUI window layout
-# Run the program when the 'Run' button is clicked
-
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 layout = [
     [sg.Text("Click 'Run' to start the program")],
@@ -47,6 +35,40 @@ if __name__ == '__main__':
             break
         elif event == 'Run':
             window['Run'].update(disabled=True)
+
+            def resource_path(relative_path):
+                """ Get absolute path to resource, works for dev and for PyInstaller """
+                try:
+                    # PyInstaller creates a temp folder and stores path in _MEIPASS
+                    base_path = sys._MEIPASS
+                except Exception:
+                    base_path = os.path.abspath(".")
+
+                return os.path.join(base_path, relative_path)
+
+
+
+
+            device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+            pandas_dataframe_1 = pandas_dataframe()
+
+            df = pandas_dataframe_1.dataframe()
+            df.dropna(inplace=True)
+            df['Type'] = df['Type'].replace({'non_interacting_processes': '0', 'interacting_processes': '1'})
+            df.drop(['Name'], axis=1, inplace=True)
+            df = df.astype('float32')
+
+            columns_to_normalize = ['cpu_uses', 'memory_uses', 'Wi_fi_uses', 'disc_uses']
+
+            scaler = MinMaxScaler(feature_range=(0, 1))
+            df[columns_to_normalize] = scaler.fit_transform(df[columns_to_normalize])
+            # Create the PySimpleGUI window layout
+            # Run the program when the 'Run' button is clicked
+
+            device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+
             if not df.empty:
                 class CustomDataset(Dataset):
                     def __init__(self, df, num_columns):
@@ -94,18 +116,19 @@ if __name__ == '__main__':
                             y = torch.tensor(-1)  # Default value when logic doesn't assign a specific value
                         return x, y.unsqueeze(-1)
 
+                Dataset = CustomDataset(df, 50)
+                dataloader = DataLoader(Dataset, batch_size=32,shuffle=False)
                 model = nn.Sequential(
-                    nn.Flatten(),  # Reshape the input tensor to [batch_size, 25]
-                    nn.Linear(25, 30),
+                    nn.Flatten(), 
+                    nn.Linear(250,50),  # here 5 is the number of dataframe columns or input features
                     nn.ReLU(),
-                    nn.Linear(30, 10),
-                    nn.Tanh(),
-                    nn.Linear(10, 1),  # Output size is set to 10 instead of 1
+                    nn.Linear(50, 1),  
+                    nn.Sigmoid()
+                    
                 ).to(device)
-                model.load_state_dict(torch.load('model.pt'))
+
+                model.load_state_dict(torch.load(resource_path('model.pt')))
                 model.to(device)
-                custom_dataset = CustomDataset(df, 5)
-                dataloader = DataLoader(custom_dataset, batch_size=32)
                     # model = model.to(device)
                 optimizer = optim.Adam(model.parameters(), lr=0.001)
                 loss_fn = nn.MSELoss()
@@ -132,16 +155,19 @@ if __name__ == '__main__':
                     model.train()
                     # Forward pass
                     y_pred = model(x)
-                    print(f'shape of x: {x.shape}')
-                    print(f'shape of y: {y.shape}')
-                    print(f'shape of y_pred: {y_pred.shape}')
-                    print(f'y_pred: {y_pred}')
+                    # print(f'shape of x: {x.shape}')
+                    # print(f'shape of y: {y.shape}')
+                    # print(f'shape of y_pred: {y_pred.shape}')
+                    # print(f'y_pred: {y_pred}')
 
                     for item in y_pred:
                         value = item.item()  # Get the value of the item as a Python float
                         print(value)
                         if value >0:
-                            subprocess.run(["python", "try_act_1.py"])
+                            new_folder_1 = new_folder.make_new_folder()
+                    
+                    print('Sir i have exe')
+                            
 
                     # Compute the loss
                     loss = loss_fn(y_pred, y)

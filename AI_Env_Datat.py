@@ -2,7 +2,7 @@ import psutil
 import pynvml
 import wmi
 import ctypes
-import subprocess
+
 
 class SystemInfo:
     def __init__(self):

@@ -1,8 +1,5 @@
 from AI_Env_Data_2 import Env_data_process
-import numpy as np
 import pandas as pd
-import psutil
-
 class pandas_data_collection():
     """Convert cpu, memory, wifi, disk used data to a pandas DataFrame."""
     def __init__(self):
@@ -78,6 +75,7 @@ class pandas_data_collection():
         return df
 
     def base_df(self):
+        """Generate the base dataframe by concratng a single base_intarected_df and a base_un_intarected_df."""
         intarected_df = self.base_intarected_df()  # Generate the interacting processes dataframe
         un_intarected_df = self.base_un_intarected_df()  # Generate the non-interacting processes dataframe
 
@@ -95,6 +93,7 @@ class pandas_data_collection():
         return df
 
     def pad_df(self, df, length):
+        """Pad a dataframe with None values to ensure it has a certain length."""
         if len(df) < length:
             num_rows = length - len(df)
             padding = pd.DataFrame([[None] * df.shape[1]] * num_rows, columns=df.columns)
