@@ -49,7 +49,7 @@ class TrainingDataFrameApp:
         inner_dfs = []
         outer_dfs = []
         pdc = pandas_data_collection()
-
+        start_time = time.time()
         for outer_loop in range(total_iterations):
             for inner_loop in range(1):
                 df = pdc.base_df()
@@ -79,6 +79,8 @@ class TrainingDataFrameApp:
         # post-processing end
         print("Data collection complete.\n\n")
         print('please double click to the save button\nprovide desigred extension(.csv to train the model)\n')
+        end_time = time.time()
+        print(f"Total time taken: {end_time - start_time} seconds\n\n")
         result_df = result_df.astype('float32')
         self.result_df = result_df
 

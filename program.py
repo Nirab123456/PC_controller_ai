@@ -187,7 +187,14 @@ if __name__ == '__main__':
                 
                     loop_counter += 1
 
-        window.close()
+
+
+
+        window['Run'].update(disabled=False)
+        window.refresh()
+
+
+window.close()
 
 
 
