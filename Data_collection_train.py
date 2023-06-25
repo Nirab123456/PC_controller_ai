@@ -4,6 +4,10 @@ import pandas as pd
 import time
 from sklearn.preprocessing import MinMaxScaler
 
+sg.theme("DarkAmber")   
+
+
+
 
 class TrainingDataFrameApp:
     """Collect data from the environment and convert it to a Pandas DataFrame for training."""
@@ -81,6 +85,7 @@ class TrainingDataFrameApp:
         print('please double click to the save button\nprovide desigred extension(.csv to train the model)\n')
         end_time = time.time()
         print(f"Total time taken: {end_time - start_time} seconds\n\n")
+        # result_df = result_df.drop('index', axis=1)
         result_df = result_df.astype('float32')
         self.result_df = result_df
 

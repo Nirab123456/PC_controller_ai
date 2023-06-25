@@ -12,18 +12,12 @@ from Data_collection_train import TrainingDataFrameApp
 from torch.utils.tensorboard import SummaryWriter
 
 
+
+sg.theme("DarkAmber")   
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# # Create the tkinter window
-# window = tk.Tk()
-# window.geometry("400x400")
-# window.configure(bg="#f0f0f0")
 
-# # Create an instance of the TrainingDataFrameApp class
-# app = TrainingDataFrameApp(window)
-
-# # Start the tkinter event loop
-# window.mainloop()
 
 
 def main():
@@ -96,14 +90,15 @@ class CustomDataset(Dataset):
         return x, y.unsqueeze(-1)
 
 
+user_id = sys.argv[1]
+model_name = sys.argv[2]
+
 
 layout = [
     [sg.Text("Enter the name of the file you want to train((.csv)extensin not needed):", font=("Arial", 12))],
     [sg.Input(key='-FILENAME-', size=(40, 1))],
     [sg.Text("Enter the number of epochs:", font=("Arial", 12))],
     [sg.Input(key='-NUM_EPOCHS-', size=(40, 1))],
-    [sg.Text("Please Enter the Name of your pre trained model if you have one ((.pt)extensin not needed):", font=("Arial", 12))],
-    [sg.Input(key='-PRE_TRAINED-', size=(40, 1))],
     [sg.Button("Run", size=(10, 1), button_color=('white', '#4CAF50'), font=("Arial", 12))],
     [sg.Button("Exit", size=(10, 1), button_color=('white', '#D32F2F'), font=("Arial", 12))],
     [sg.Output(size=(80, 20), font=("Arial", 12), key='-OUTPUT-')]
@@ -122,8 +117,8 @@ if __name__ == '__main__':
             file_path = file_name + '.csv'
             df = pd.read_csv(file_path)
             df = df.astype('float32')
-            Dataset = CustomDataset(df, 50)
-            dataloader = DataLoader(Dataset, batch_size=32,shuffle=False)
+            dataset = CustomDataset(df, 50)
+            dataloader = DataLoader(dataset, batch_size=32,shuffle=False)
 
             model = nn.Sequential(
                 nn.Flatten(), 
@@ -133,13 +128,15 @@ if __name__ == '__main__':
                 nn.Sigmoid()
                 
             ).to(device)
-            model_state_name = values['-PRE_TRAINED-']
-            model_state_name = model_state_name + '.pt'
+            user_id = sys.argv[1]# Retrieve the user id from the input field from subprocess
+            model_name = sys.argv[2]# Retrieve the model name from the input field from subprocess
+            model_state_name = model_name#.pt was add in Ui_main_frame.py
             if os.path.isfile(model_state_name):
-                try:
-                    model.load_state_dict(torch.load(model_state_name))
-                except:
-                    continue
+                model.load_state_dict(torch.load(model_state_name))
+            else:
+                model= model.to(device)
+                
+
 
             optimizer = optim.Adam(model.parameters(), lr=0.001)
             loss_fn = nn.MSELoss()
@@ -179,7 +176,7 @@ if __name__ == '__main__':
                         writer.add_scalar('Loss', avg_loss, epoch * num_batches + batch_idx)
                         writer.add_scalar('Variance', variance, epoch * num_batches + batch_idx)
                         # Save the model
-                        save_path = f'your_model{loop_counter}.pt'
+                        save_path = model_name #.pt has been added in Ui_main_frame.py
                         torch.save(model.state_dict(), save_path)
                     
                     loop_counter += 1
