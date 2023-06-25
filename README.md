@@ -60,7 +60,7 @@ Once you have installed the dependencies, you can run the project using the prov
 
 4. Run the script:
    ```
-   python test.py
+   python Ui_main_frame.py
    ```
 
 5. The application monitoring will start, and you will receive real-time updates on the interaction and non-interaction states of the top 10 applications.
