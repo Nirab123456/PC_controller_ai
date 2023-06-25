@@ -4,3 +4,5 @@ wmi
 ctypes
 pandas
 numpy
+torch
+subprocess
