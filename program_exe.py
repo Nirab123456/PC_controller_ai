@@ -14,36 +14,100 @@ from check_user_interaction import UserInputChecker
 import time
 from action import Process_task
 
-# checker = UserInputChecker()
-# time.sleep(.3)
-# if checker.check_input():
-#     print("User interacted.")
-# else:
+class CustomDataset(Dataset):
+    def __init__(self, df, num_columns):
+        self.df = df
+        self.num_columns = num_columns
+
+    def _custom_logic(self, subset):
+        cpu_variance = subset['cpu_uses'].var()
+        memory_variance = subset['memory_uses'].var()
+        disc_variance = subset['disc_uses'].var()
+        wifi_variance = subset['Wi_fi_uses'].var()
+
+        y_value = 0
+        if 1 in subset['Type'].values:
+            y_value = 0
+        else:
+            # hibernate
+            if (
+                cpu_variance > 0.7
+                and memory_variance > 0.7
+                and disc_variance > 0.7
+                and wifi_variance > 0.7
+            ):
+                y_value = 0.1
+            # sleep
+            elif (
+                cpu_variance > 0.5
+                and memory_variance > 0.5
+                and disc_variance > 0.5
+                and wifi_variance > 0.5
+                and cpu_variance < 0.7
+                and memory_variance < 0.7
+                and disc_variance < 0.7
+                and wifi_variance < 0.7
+            ):
+                y_value = 0.2
+            # shutoff display
+            elif (
+                cpu_variance < 0.3
+                and memory_variance < 0.3
+                and disc_variance > 0.5
+                and wifi_variance < 0.5
+            ):
+                y_value = 0.3
+            # shutoff display
+            elif (
+                cpu_variance < 0.3
+                and memory_variance < 0.3
+                and disc_variance < 0.5
+                and wifi_variance > 0.5
+            ):
+                y_value = 0.3
+        return y_value
+
+    def __len__(self):
+        return len(self.df) // self.num_columns
+
+    def __getitem__(self, idx):
+        start_row = idx * self.num_columns
+        end_row = (idx + 1) * self.num_columns
+        subset = self.df.iloc[start_row:end_row]
+        y = self._custom_logic(subset)
+        x = subset.values
+        x = torch.tensor(x)
+        if y is not None:
+            y = torch.tensor(y)
+        else:
+            y = torch.tensor(-1)  # Default value when logic doesn't assign a specific value
+        return x, y.unsqueeze(-1)
 
 
-sg.theme("DarkAmber")
-
-
-layout = [
-    [sg.Text("Click 'Run' to start the program,")],
-    [sg.Button("Run")],
-    [sg.Button("Exit")],
-    [sg.Output(size=(20, 10))]
-]
 
 
 
 
+def execute_task(user_id, model_name):
+    sg.theme("DarkAmber")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# Create the PySimpleGUI window
-window = sg.Window("Program Runner", layout)
+    layout = [
+        [sg.Text("Click 'Run' to start the program.")],
+        [sg.Button("Run")],
+        [sg.Button("Exit")],
+        [sg.Output(size=(20, 10))]
+    ]
 
-if __name__ == '__main__':
+    # Create the PySimpleGUI window
+    window = sg.Window("Program Runner", layout)
+
     while True:
         event, values = window.read()
         if event == sg.WINDOW_CLOSED or event == 'Exit':
             break
         elif event == 'Run':
+                
             window['Run'].update(disabled=True)
             
             checker = UserInputChecker()
@@ -64,74 +128,6 @@ if __name__ == '__main__':
             device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
             if not df.empty:
-                class CustomDataset(Dataset):
-                    def __init__(self, df, num_columns):
-                        self.df = df
-                        self.num_columns = num_columns
-
-                    def _custom_logic(self, subset):
-                        cpu_variance = subset['cpu_uses'].var()
-                        memory_variance = subset['memory_uses'].var()
-                        disc_variance = subset['disc_uses'].var()
-                        wifi_variance = subset['Wi_fi_uses'].var()
-
-                        y_value = 0
-                        if 1 in subset['Type'].values:
-                            y_value = 0
-                        else:
-                            # hibernate
-                            if (
-                                cpu_variance > 0.7
-                                and memory_variance > 0.7
-                                and disc_variance > 0.7
-                                and wifi_variance > 0.7
-                            ):
-                                y_value = 0.1
-                            # sleep
-                            elif (
-                                cpu_variance > 0.5
-                                and memory_variance > 0.5
-                                and disc_variance > 0.5
-                                and wifi_variance > 0.5
-                                and cpu_variance < 0.7
-                                and memory_variance < 0.7
-                                and disc_variance < 0.7
-                                and wifi_variance < 0.7
-                            ):
-                                y_value = 0.2
-                            # shutoff display
-                            elif (
-                                cpu_variance < 0.3
-                                and memory_variance < 0.3
-                                and disc_variance > 0.5
-                                and wifi_variance < 0.5
-                            ):
-                                y_value = 0.3
-                            # shutoff display
-                            elif (
-                                cpu_variance < 0.3
-                                and memory_variance < 0.3
-                                and disc_variance < 0.5
-                                and wifi_variance > 0.5
-                            ):
-                                y_value = 0.3
-                        return y_value
-
-                    def __len__(self):
-                        return len(self.df) // self.num_columns
-
-                    def __getitem__(self, idx):
-                        start_row = idx * self.num_columns
-                        end_row = (idx + 1) * self.num_columns
-                        subset = self.df.iloc[start_row:end_row]
-                        y = self._custom_logic(subset)
-                        x = subset.values
-                        x = torch.tensor(x)
-                        if y is not None:
-                            y = torch.tensor(y)
-                        else:
-                            y = torch.tensor(-1)  # Default value when logic doesn't assign a specific value
-                        return x, y.unsqueeze(-1)
 
                 Dataset = CustomDataset(df, 50)
                 dataloader = DataLoader(Dataset, batch_size=32, shuffle=False)
@@ -142,9 +138,6 @@ if __name__ == '__main__':
                     nn.Linear(50, 1),
                     nn.Sigmoid(),
                 ).to(device)
-                
-                user_id = sys.argv[1]
-                model_name = sys.argv[2]
 
                 model_state_name = model_name#.pt was add in Ui_main_frame.py
 
@@ -217,21 +210,20 @@ if __name__ == '__main__':
 
 
 
-        window['Run'].update(disabled=False)
-        window.refresh()
+            window['Run'].update(disabled=False)
+            window.refresh()
 
 
-window.close()
-
-
-
+    window.close()
 
 
 
+if __name__ == '__main__':
+    user_id = "default_user_id"
+    model_name = "default_model_name"
+    execute_task(user_id, model_name)
 
 
 
 
-
-# df.to_csv('data.csv', index=False)
 

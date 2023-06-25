@@ -3,6 +3,8 @@ import json
 import os 
 from json_user import User,check_json_file_existence
 import subprocess
+from train import execute_training 
+from program_exe import execute_task
 
 sg.theme("DarkAmber")   
 
@@ -66,8 +68,8 @@ while True:
         if base_user.check_data_existence():
             choice = sg.popup_yes_no('Do you want to train the model?')
             if choice == 'Yes':
-                subprocess.call(["python", "train.py", user_id, model_name])
-                sg.popup(f"Model training Commpeted")
+                execute_training(user_id, model_name)
+                sg.popup(f"Model has been trained")
 
         else:
             sg.popup('Please first use the save button and save your data ')
@@ -89,7 +91,7 @@ while True:
         if proceed and base_user.check_data_existence():
             choice = sg.popup_yes_no('Do you want to execute the model?')
             if choice == 'Yes':
-                subprocess.call(["python", "program_exe.py", user_id, model_name])
+                execute_task(user_id, model_name) 
                 sg.popup(f"sir please user the same user id and model name to execute that model")
         else:
             sg.popup(f"Please first create an ID and train the model")
