@@ -43,6 +43,8 @@ if __name__ == '__main__':
 
             if not df.empty:
                 class CustomDataset(Dataset):
+                    """Custom Dataset for loading data from the dataframe"""
+
                     def __init__(self, df, num_columns):
                         self.df = df
                         self.num_columns = num_columns

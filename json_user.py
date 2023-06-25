@@ -37,6 +37,7 @@ class User:
             json.dump(data, file)
 
     def check_data_existence(self):
+        """Check if the user ID and the desired model already exist in the data"""
         file_path = self.file_path
         with open(file_path, "r") as file:
             file_data = json.load(file)
@@ -45,6 +46,7 @@ class User:
         return False
 
     def check_user_existence(self):
+        """Check if the user ID already exist in the data"""
         file_path = self.file_path
         with open(file_path, "r") as file:
             file_data = json.load(file)
@@ -53,6 +55,7 @@ class User:
         return False
 
     def update_user_data(self):
+        """Update the user data with the new desired model"""
         file_path = self.file_path
         data = self.load_user_data()
         # Check if the user ID already exists in the data
@@ -67,6 +70,7 @@ class User:
     
 
     def load_user_data(self):
+        """Load the user data"""
         file_path = self.file_path
         with open(file_path, "r") as file:
             data = json.load(file)
@@ -78,6 +82,7 @@ class User:
 
 
 def check_json_file_existence(user_id):
+    """Check if the json file exists """
     user_id = user_id + ".json"
     if user_id not in os.listdir():
         return False

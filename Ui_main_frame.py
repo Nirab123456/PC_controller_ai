@@ -62,7 +62,8 @@ while True:
         user_id = values["-USERID-"]
         model_name = values["-MODELNAME-"]
         model_name = model_name + ".pt"
-        if check_json_file_existence(user_id)==True:
+        base_user = User(user_id=user_id, desigred_model=model_name)
+        if base_user.check_data_existence():
             choice = sg.popup_yes_no('Do you want to train the model?')
             if choice == 'Yes':
                 subprocess.call(["python", "train.py", user_id, model_name])
@@ -79,16 +80,20 @@ while True:
         model_name = model_name + ".pt"
         base_user = User(user_id=user_id, desigred_model=model_name)
         
+        proceed = True  # Initialize proceed with a default value
+        
         if not os.path.exists(model_name):
             sg.popup("Model does not exist")
             proceed = False
+        
         if proceed and base_user.check_data_existence():
             choice = sg.popup_yes_no('Do you want to execute the model?')
             if choice == 'Yes':
                 subprocess.call(["python", "program_exe.py", user_id, model_name])
-                sg.popup(f"model has been shut down")
+                sg.popup(f"sir please user the same user id and model name to execute that model")
         else:
-            sg.popup(f"please first create an id and train the model")
+            sg.popup(f"Please first create an ID and train the model")
+
 
     # Close the window
     window.close()

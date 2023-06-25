@@ -2,6 +2,7 @@ from AI_Env_Datat import SystemInfo
 
 class Env_data_process(SystemInfo):
     def __init__(self):
+        """Initializes the data for the current state"""
         super().__init__()
         self.system_info = None
         self.gpu_processes = None
