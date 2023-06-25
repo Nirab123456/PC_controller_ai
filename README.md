@@ -1,5 +1,10 @@
 **Project Name: PC Application Monitoring(mainly for collecting training_dataset)**
 
+Use the executable file for testing purpose 
+link-https://mega.nz/file/s2FAnbCb#KO8Tms1fpb09rBillo_B7UXgoSwLcVXoiXxLpK2493U
+
+
+
 README
 
 This project aims to provide a simple solution for monitoring the interaction and non-interaction states of the top 10 applications on your PC using deep learning techniques. The project utilizes the Python programming language and leverages the power of libraries such as psutil, pynvml, wmi, ctypes, and pandas to collect and analyze the data.
