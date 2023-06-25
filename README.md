@@ -1,5 +1,17 @@
 **Project Name: PC Application Monitoring(mainly for collecting training_dataset)**
 
+
+
+
+https://github.com/Nirab123456/PC_controller_ai/assets/128963796/644195fc-aa8c-4e6e-a9f2-179ab49bb358
+
+
+
+
+
+
+
+
 Use the executable file for testing purpose 
 link-https://mega.nz/file/s2FAnbCb#KO8Tms1fpb09rBillo_B7UXgoSwLcVXoiXxLpK2493U
 
